@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
+from datetime import date
 
 def get_candles(symbol, start_date, end_date, interval=10, show=False, engine="stock", market="shares", board="TQBR"):
     url = f"https://iss.moex.com/iss/engines/{engine}/markets/{market}/boards/{board}/securities/{symbol}/candles.json"
@@ -41,7 +42,17 @@ def get_candles(symbol, start_date, end_date, interval=10, show=False, engine="s
     return df
 
 def main():
-    print(get_candles("BRM6", "2026-05-20", "2026-05-23"))
+    df = get_candles(
+        "BRM6",
+        date(2026, 5, 20),
+        date(2026, 5, 23),
+        interval=10,
+        engine="futures",
+        market="forts",
+        board="RFUD",
+        show=True
+    )
+    print(df)
 
 if __name__ == "__main__":
     main()

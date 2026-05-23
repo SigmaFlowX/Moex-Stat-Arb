@@ -1,52 +1,42 @@
 import requests
-from datetime import datetime, timezone
+import pandas as pd
+from datetime import datetime, timedelta
 
-def authorize(refresh_token):
-    url = "https://be.broker.ru/trade-api-keycloak/realms/tradeapi/protocol/openid-connect/token"
+def get_candles(symbol, start_date, end_date, interval=10, show=False):
+    url = f"https://iss.moex.com/iss/engines/stock/markets/shares/boards/TQBR/securities/{symbol}/candles.json"
+    cur_date = start_date
 
-    payload = {
-        "client_id": "trade-api-write",
-        "refresh_token": refresh_token,
-        "grant_type": "refresh_token"
-    }
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Accept": "application/json"
-    }
-
-    response = requests.post(url, headers=headers, data=payload)
-
-    if response.status_code == 200:
-        tokens = response.json()
-        token = tokens["access_token"]
-        return token
+    if interval == 10:
+        delta = 3
     else:
-        print("Error while trying  to authorize:", response.status_code, response.text)
-        return None
+        delta = 0.5
+    df = pd.DataFrame()
 
-def get_candles(token, ticker, start_date, end_date, class_code="TQBR", timeframe = "M1"):
-    url = "https://be.broker.ru/trade-api-market-data-connector/api/v1/candles-chart"
+    session = requests.Session()
 
-    start_date = datetime.fromisoformat(start_date).astimezone(timezone.utc)
-    start_date = start_date.isoformat(timespec="milliseconds")
+    while cur_date < end_date:
+        params = {
+            "from": cur_date,
+            "till": cur_date + timedelta(days=delta),
+            "interval": interval
+        }
+        response = session.get(url, params=params)
+        data = response.json()
 
-    end_date = datetime.fromisoformat(end_date).astimezone(timezone.utc)
-    end_date = end_date.isoformat(timespec="milliseconds")
+        temp_df = pd.DataFrame(data["candles"]["data"], columns=data["candles"]["columns"])
+        df = pd.concat([df, temp_df], ignore_index=True)
 
-    headers = {
-        "Accept": "application/json",
-        "Authorization": f"Bearer {token}"
-    }
 
-    payload = {
-        "classCode": class_code,
-        "ticker": ticker,
-        "startDate": start_date,
-        "endDate": end_date,
-        "timeFrame": timeframe
-    }
+        cur_date = cur_date + timedelta(days=delta)
+        if show:
+            print(cur_date)
 
-    response = requests.get(url, headers=headers, params=payload)
+    duplicates_count = df.duplicated(subset=["begin"]).sum()
+    df.drop_duplicates(subset=["begin"], inplace=True)
+    print("Number of deleted duplicates:", duplicates_count)
 
-    return response.json()['bars']
+    df['timestamp'] = pd.to_datetime(df['begin'])
+    df.set_index('timestamp', inplace=True)
+    df.drop(columns=['begin'], inplace=True)
+
+    return df

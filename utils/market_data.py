@@ -3,43 +3,39 @@ import pandas as pd
 from datetime import datetime, timedelta
 from datetime import date
 
-INTERVAL_DELTA = {
-    1:   timedelta(hours=8),
-    10:  timedelta(days=4),
-    60:  timedelta(days=20),
-    1440: timedelta(days=365),
-}
-
 
 def get_candles(symbol, start_date, end_date, interval=10, show=False, engine="stock", market="shares", board="TQBR"):
     url = f"https://iss.moex.com/iss/engines/{engine}/markets/{market}/boards/{board}/securities/{symbol}/candles.json"
-    cur_date = start_date
-
-    delta = INTERVAL_DELTA[interval]
-    df = pd.DataFrame()
 
     session = requests.Session()
+    all_dfs = []
+    start = 0
+    while True:
 
-    while cur_date < end_date:
         params = {
-            "from": cur_date,
-            "till": cur_date + delta,
+            "start": start,
+            "from": start_date,
+            "till": end_date,
             "interval": interval,
         }
-        response = session.get(url, params=params)
+
+        response = session.get(url, params=params, timeout=30)
         data = response.json()
 
-        temp_df = pd.DataFrame(data["candles"]["data"], columns=data["candles"]["columns"])
-        df = pd.concat([df, temp_df], ignore_index=True)
+        candles = data.get("candles", {})
+        rows = candles.get("data", [])
+        cols = candles.get("columns", [])
 
-        cur_date = cur_date + delta
-        if show:
-            print(cur_date)
+        all_dfs.append(pd.DataFrame(rows, columns=cols))
 
-    duplicates_count = df.duplicated(subset=["begin"]).sum()
-    df.drop_duplicates(subset=["begin"], inplace=True)
-    print("Number of deleted duplicates:", duplicates_count)
+        if len(rows) < 500:
+            break
+        start += 500
 
+    if not all_dfs:
+        return pd.DataFrame()
+
+    df = pd.concat(all_dfs, ignore_index=True)
     df["timestamp"] = pd.to_datetime(df["begin"])
     df.set_index("timestamp", inplace=True)
     df.drop(columns=["begin"], inplace=True)

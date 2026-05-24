@@ -1,6 +1,5 @@
 import requests
 import pandas as pd
-from datetime import datetime, timedelta
 from datetime import date
 
 
@@ -51,9 +50,12 @@ def main():
         engine="futures",
         market="forts",
         board="RFUD",
-        show=True
     )
-    print(df)
+
+    import matplotlib.pyplot as plt
+    plt.scatter(df.index, df['close'])
+    plt.xticks(rotation=45)
+    plt.show()
 
 if __name__ == "__main__":
     main()

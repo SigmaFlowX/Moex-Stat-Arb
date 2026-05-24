@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from datetime import date
 
 
-def get_candles(symbol, start_date, end_date, interval=10, show=False, engine="stock", market="shares", board="TQBR"):
+def get_candles(symbol, start_date, end_date, interval=10, engine="stock", market="shares", board="TQBR"):
     url = f"https://iss.moex.com/iss/engines/{engine}/markets/{market}/boards/{board}/securities/{symbol}/candles.json"
 
     session = requests.Session()

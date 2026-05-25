@@ -26,11 +26,30 @@ def get_futures_by_asset(asset_code: str, show_expired: bool=False):
     df = pd.DataFrame(block["data"], columns=block["columns"])
     return df
 
+
+def get_underlying_type(secid: str) -> str | None:
+    url = f"https://iss.moex.com/iss/securities/{secid}.json"
+    params = {"iss.only": "description"}
+
+    try:
+        r = requests.get(url, params=params, timeout=10)
+        r.raise_for_status()
+
+        block = r.json()["description"]
+        df = pd.DataFrame(block["data"], columns=block["columns"])
+
+        row = df[df["name"] == "GROUP"]
+        return row["value"].values[0] if not row.empty else None
+    except Exception:
+        return None
+
+
 def get_all_futures():
     asset_codes = get_all_asset_codes()
 
     dfs = []
     for code in asset_codes:
+        print(code)
         try:
             df = get_futures_by_asset(code)
             if not df.empty:
@@ -39,6 +58,16 @@ def get_all_futures():
             print(e)
 
     result = pd.concat(dfs, ignore_index=True)
+
+    underlyings = result["underlying_asset"].dropna().unique().tolist()
+    underlying_types = {}
+    for secid in underlyings:
+        print(secid)
+        underlying_types[secid] = get_underlying_type(secid)
+
+    result["underlying_type"] = result["underlying_asset"].map(underlying_types)
+    print(f"NaN в underlying_type: {result['underlying_type'].isna().sum()} из {len(result)}")
+
     return result
 
 

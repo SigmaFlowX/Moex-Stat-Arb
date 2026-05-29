@@ -21,3 +21,15 @@ def run_backtest(df, fee, z_window, z_exit, z_entry):
     mean, std = bt['spread'].rolling(z_window).mean(), bt['spread'].rolling(z_window).std()
     bt['z_score'] = (bt['spread'] - mean) / std
 
+    bt['signal'] = np.nan
+    bt.loc[bt['z_score'] > z_entry, 'signal'] = -1
+    bt.loc[bt['z_score'] < -z_entry, 'signal'] = 1
+    bt.loc[bt['z_score'].abs() < z_exit, 'signal'] = 0
+    bt['signal'] = bt['signal'].ffill().fillna(0)
+
+    bt['position'] = bt['signal'].shift(1).fillna(0)
+
+    pos = bt['position']
+    changed = pos != pos.shift(1)
+    bt['entry_beta'] = (bt['beta'].shift(1).where(changed).ffill()).where(pos != 0, 0.0)
+

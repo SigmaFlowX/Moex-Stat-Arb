@@ -3,6 +3,27 @@ import pandas as pd
 from datetime import date
 
 
+#get candles for two tickers and merge them in preparation for the backtest
+def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval):
+    df1 = get_candles(
+        inst1['ticker'],
+        start_date,
+        end_date,
+        engine=inst1['engine'],
+        market=inst1['market'],
+        board=inst1['board'],
+        interval=interval)
+
+    df2 = get_candles(
+        inst2['ticker'],
+        start_date,
+        end_date,
+        engine=inst2['engine'],
+        market=inst2['market'],
+        board=inst2['board'],
+        interval=interval)
+
+
 def get_candles(symbol, start_date, end_date, interval=10, engine="stock", market="shares", board="TQBR"):
     url = f"https://iss.moex.com/iss/engines/{engine}/markets/{market}/boards/{board}/securities/{symbol}/candles.json"
 

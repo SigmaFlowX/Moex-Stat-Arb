@@ -23,6 +23,20 @@ def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval):
         board=inst2['board'],
         interval=interval)
 
+    df1.sort_values(by="timestamp", inplace=True)
+    df2.sort_values(by="timestamp", inplace=True)
+
+    df = pd.merge_asof(
+        df1,
+        df2,
+        left_on="timestamp",
+        right_on="timestamp",
+        direction="nearest",
+        tolerance=pd.Timedelta("5m")
+    )
+
+    return df
+
 
 def get_candles(symbol, start_date, end_date, interval=10, engine="stock", market="shares", board="TQBR"):
     url = f"https://iss.moex.com/iss/engines/{engine}/markets/{market}/boards/{board}/securities/{symbol}/candles.json"

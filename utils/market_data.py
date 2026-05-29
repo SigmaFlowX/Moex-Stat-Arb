@@ -4,7 +4,7 @@ from datetime import date
 
 
 #get candles for two tickers and merge them in preparation for the backtest
-def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval):
+def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval, tolerance: str = "5m"):
     df1 = get_candles(
         inst1['ticker'],
         start_date,
@@ -32,7 +32,7 @@ def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval):
         left_on="timestamp",
         right_on="timestamp",
         direction="nearest",
-        tolerance=pd.Timedelta("5m")
+        tolerance=pd.Timedelta(tolerance)
     )
 
     return df

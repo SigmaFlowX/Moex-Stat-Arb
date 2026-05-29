@@ -42,3 +42,9 @@ def run_backtest(df, fee, z_window, z_exit, z_entry):
     gross = bt['position'] * (bt['return_x'] - w_y * bt['return_y'])
     bt['strategy_return'] = (gross / capital).fillna(0.0)
 
+    turnover = (bt['position'] - bt['position'].shift(1)).abs().fillna(0.0)
+    bt['fee'] = turnover * fee * 2 * (1.0 + w_y.abs()) / capital
+    bt['net_return'] = bt['strategy_return'] - bt['fee']
+    bt['equity'] = (1.0 + bt['net_return']).cumprod()
+
+    return bt

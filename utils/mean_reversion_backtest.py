@@ -58,8 +58,8 @@ def run_backtest(df, z_window, z_exit, z_entry, fee=0.02/100,):
     changed = pos != pos.shift(1)
     bt['entry_beta'] = (bt['beta'].shift(1).where(changed).ffill()).where(pos != 0, 0.0)
 
-    bt['return_x'] = bt['close_x'].pct_change()
-    bt['return_y'] = bt['close_y'].pct_change()
+    bt['return_x'] = bt['close_x'].pct_change(fill_method=None)
+    bt['return_y'] = bt['close_y'].pct_change(fill_method=None)
 
     w_y = (bt['entry_beta'] * bt['close_y'].shift(1) / bt['close_x'].shift(1)).fillna(0.0)
     capital = 1.0 + w_y.abs()

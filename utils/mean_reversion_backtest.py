@@ -77,7 +77,7 @@ def objective(trial, df):
     df = df.copy()
 
     z_entry = trial.suggest_float('z_entry', 0.0, 5)
-    z_exit = trial.suggest_flaot('z_exit', 0.0, z_entry)
+    z_exit = trial.suggest_float('z_exit', 0.0, z_entry)
     z_window = trial.suggets_int('z_window', 0, 100)
 
     bt = run_backtest(df, z_window, z_exit, z_entry)

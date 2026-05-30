@@ -85,3 +85,10 @@ def objective(df, trial):
 
     return total_return
 
+
+def optimize(df, trials=200):
+    study = optuna.create_study(direction="maximize")
+    study.optimize(lambda trial: objective(trial, df), n_trials=trials, n_jobs=-1)
+
+    return study.best_params
+

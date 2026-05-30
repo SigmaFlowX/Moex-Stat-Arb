@@ -38,7 +38,9 @@ def run_backtest(df, z_window, z_exit, z_entry, fee=0.02/100,):
     bt = df.copy()
 
     alpha, beta = rolling_ols(bt['close_x'], bt['close_y'], window=z_window)
-    bt['beta'] = beta
+    bt['beta'] = beta.shift(1)
+    bt['alpha'] = alpha.shift(1)
+
     bt['spread'] = bt['close_x'] - beta * bt['close_y'] - alpha
 
     mean, std = bt['spread'].rolling(z_window).mean(), bt['spread'].rolling(z_window).std()
@@ -78,7 +80,7 @@ def objective(trial, df):
 
     z_entry = trial.suggest_float('z_entry', 0.0, 5)
     z_exit = trial.suggest_float('z_exit', 0.0, z_entry)
-    z_window = trial.suggets_int('z_window', 0, 100)
+    z_window = trial.suggest_int('z_window', 0, 100)
 
     bt = run_backtest(df, z_window, z_exit, z_entry)
     total_return = bt.iloc[-1]['equity'] - 1

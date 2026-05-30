@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import optuna
 
 
 def rolling_ols(A, B, window):
@@ -11,7 +12,7 @@ def rolling_ols(A, B, window):
     alpha = mean_A - beta * mean_B
     return alpha, beta
 
-def run_backtest(df, fee, z_window, z_exit, z_entry):
+def run_backtest(df, z_window, z_exit, z_entry, fee=0.02/100,):
     bt = df.copy()
 
     alpha, beta = rolling_ols(bt['close_x'], bt['close_y'], window=z_window)
@@ -48,3 +49,17 @@ def run_backtest(df, fee, z_window, z_exit, z_entry):
     bt['equity'] = (1.0 + bt['net_return']).cumprod()
 
     return bt
+
+
+def objective(df, trial):
+    df = df.copy()
+
+    z_entry = trial.suggest.float('z_entry', 0.0, 5)
+    z_exit = trial.suggest.flaot('z_exit', 0.0, z_entry)
+    z_window = trial.suggets.int('z_window', 0, 100)
+
+    bt = run_backtest(df, z_window, z_exit, z_entry)
+    total_return = bt.iloc[-1]['equity'] - 1
+
+    return total_return
+

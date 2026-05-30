@@ -3,3 +3,4 @@ matplotlib
 dotenv
 numpy
 requests
+optuna

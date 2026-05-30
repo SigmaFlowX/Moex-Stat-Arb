@@ -73,12 +73,12 @@ def run_backtest(df, z_window, z_exit, z_entry, fee=0.02/100,):
     return bt
 
 
-def objective(df, trial):
+def objective(trial, df):
     df = df.copy()
 
-    z_entry = trial.suggest.float('z_entry', 0.0, 5)
-    z_exit = trial.suggest.flaot('z_exit', 0.0, z_entry)
-    z_window = trial.suggets.int('z_window', 0, 100)
+    z_entry = trial.suggest_float('z_entry', 0.0, 5)
+    z_exit = trial.suggest_flaot('z_exit', 0.0, z_entry)
+    z_window = trial.suggets_int('z_window', 0, 100)
 
     bt = run_backtest(df, z_window, z_exit, z_entry)
     total_return = bt.iloc[-1]['equity'] - 1

@@ -36,7 +36,7 @@ def rolling_ols(A, B, window):
 
 def run_backtest(df, z_window, z_exit, z_entry, fee=0.02/100):
     bt = df.copy()
-    bt = bt[['close_x','close_y']].dropna()
+    bt = bt[['timestamp', 'close_x','close_y']].dropna()
 
     alpha, beta = rolling_ols(bt['close_x'], bt['close_y'], window=z_window)
     bt['beta'] = beta.shift(1)

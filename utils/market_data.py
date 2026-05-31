@@ -35,6 +35,8 @@ def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval, tolerance
         tolerance=pd.Timedelta(tolerance)
     )
 
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+
     return df
 
 

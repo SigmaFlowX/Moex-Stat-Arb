@@ -4,7 +4,7 @@ import optuna
 from dateutil.relativedelta import relativedelta
 
 
-def generate_walkforward_windows(df, train_months=6, test_months=3):
+def generate_walk_forward_windows(df, train_months=6, test_months=3):
     windows = []
     start_date = df['timestamp'].min()
     end_date = df['timestamp'].max()
@@ -94,4 +94,9 @@ def optimize(df, fee, trials=200):
     study.optimize(lambda trial: objective(trial, df, fee), n_trials=trials, n_jobs=-1)
 
     return study.best_params
+
+def walk_forward_optimization(df, fee, train_month, test_month):
+    df = df.copy()
+
+    windows = generate_walk_forward_windows(df, train_month, test_month)
 

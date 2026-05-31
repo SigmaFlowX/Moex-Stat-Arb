@@ -34,7 +34,7 @@ def rolling_ols(A, B, window):
     alpha = mean_A - beta * mean_B
     return alpha, beta
 
-def run_backtest(df, z_window, z_exit, z_entry, fee=0.02/100,):
+def run_backtest(df, z_window, z_exit, z_entry, fee=0.02/100):
     bt = df.copy()
     bt = bt[['close_x','close_y']].dropna()
 
@@ -76,22 +76,22 @@ def run_backtest(df, z_window, z_exit, z_entry, fee=0.02/100,):
     return bt
 
 
-def objective(trial, df):
+def objective(trial, df, fee):
     df = df.copy()
 
     z_entry = trial.suggest_float('z_entry', 0.0, 5)
     z_exit = trial.suggest_float('z_exit', 0.0, z_entry)
     z_window = trial.suggest_int('z_window', 0, 100)
 
-    bt = run_backtest(df, z_window, z_exit, z_entry)
+    bt = run_backtest(df, z_window, z_exit, z_entry, fee)
     total_return = bt.iloc[-1]['equity'] - 1
 
     return total_return
 
 
-def optimize(df, trials=200):
+def optimize(df, fee, trials=200):
     study = optuna.create_study(direction="maximize")
-    study.optimize(lambda trial: objective(trial, df), n_trials=trials, n_jobs=-1)
+    study.optimize(lambda trial: objective(trial, df, fee), n_trials=trials, n_jobs=-1)
 
     return study.best_params
 

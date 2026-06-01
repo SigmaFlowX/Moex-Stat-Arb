@@ -115,3 +115,7 @@ def walk_forward_optimization(df, fee, train_month, test_month, trials=200):
 
         equity_point= test_res['equity'].iloc[-1]
         results.append(test_res)
+
+    final_df = pd.concat(results, ignore_index=False)
+
+    return final_df

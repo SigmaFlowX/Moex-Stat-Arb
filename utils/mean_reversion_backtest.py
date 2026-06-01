@@ -100,8 +100,12 @@ def walk_forward_optimization(df, fee, train_month, test_month, trials=200):
 
     windows = generate_walk_forward_windows(df, train_month, test_month)
 
+    results = []
     for train_start, train_end, test_start, test_end in windows:
         train_df = df.loc[(df['timestamp'] > train_start) & (df['timestamp'] < train_start )].copy()
         test_df = df.loc[(df['timestamp'] > test_start) & (df['timestamp'] < test_start)].copy()
 
         params = optimize(train_df, fee, trials)
+
+        test_res = run_backtest(test_df, fee=fee, **params)
+        results.append(test_res)

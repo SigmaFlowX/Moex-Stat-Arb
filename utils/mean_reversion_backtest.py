@@ -102,8 +102,8 @@ def walk_forward_optimization(df, fee, train_month, test_month, trials=200):
 
     results = []
     for train_start, train_end, test_start, test_end in windows:
-        train_df = df.loc[(df['timestamp'] > train_start) & (df['timestamp'] < train_start )].copy()
-        test_df = df.loc[(df['timestamp'] > test_start) & (df['timestamp'] < test_start)].copy()
+        train_df = df.loc[(df['timestamp'] > train_start) & (df['timestamp'] < train_end )].copy()
+        test_df = df.loc[(df['timestamp'] > test_start) & (df['timestamp'] < test_end)].copy()
 
         params = optimize(train_df, fee, trials)
 

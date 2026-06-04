@@ -64,7 +64,6 @@ def get_all_futures():
         underlying_types[secid] = get_underlying_type(secid)
 
     result["underlying_type"] = result["underlying_asset"].map(underlying_types)
-    print(f"NaN в underlying_type: {result['underlying_type'].isna().sum()} из {len(result)}")
 
     return result
 

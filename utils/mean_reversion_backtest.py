@@ -84,6 +84,10 @@ def objective(trial, df, fee):
     z_window = trial.suggest_int('z_window', 0, 100)
 
     bt = run_backtest(df, z_window, z_exit, z_entry, fee)
+
+    if bt.empty or len(bt) == 0:
+        return -999999
+
     total_return = bt.iloc[-1]['equity'] - 1
 
     return total_return

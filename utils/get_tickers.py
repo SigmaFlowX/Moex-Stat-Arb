@@ -49,7 +49,6 @@ def get_all_futures():
 
     dfs = []
     for code in asset_codes:
-        print(code)
         try:
             df = get_futures_by_asset(code)
             if not df.empty:
@@ -62,7 +61,6 @@ def get_all_futures():
     underlyings = result["underlying_asset"].dropna().unique().tolist()
     underlying_types = {}
     for secid in underlyings:
-        print(secid)
         underlying_types[secid] = get_underlying_type(secid)
 
     result["underlying_type"] = result["underlying_asset"].map(underlying_types)

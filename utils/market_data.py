@@ -42,7 +42,7 @@ def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval, tolerance
     return df
 
 
-def get_candles(symbol, start_date, end_date, interval=10, engine="stock", market="shares", board="TQBR"):
+def get_candles(symbol, start_date, end_date, interval=10, engine="stock", market="shares", board="TQBR", show=False):
     url = f"https://iss.moex.com/iss/engines/{engine}/markets/{market}/boards/{board}/securities/{symbol}/candles.json"
 
     session = requests.Session()
@@ -64,7 +64,9 @@ def get_candles(symbol, start_date, end_date, interval=10, engine="stock", marke
         cols = candles.get("columns", [])
 
         all_dfs.append(pd.DataFrame(rows, columns=cols))
-        print(all_dfs[-1]['begin'].iloc[-1])
+
+        if show:
+            print(all_dfs[-1]['begin'].iloc[-1])
 
         if len(rows) < 500:
             break

@@ -49,7 +49,6 @@ def get_candles(symbol, start_date, end_date, interval=10, engine="stock", marke
     all_dfs = []
     start = 0
     while True:
-
         params = {
             "start": start,
             "from": start_date,
@@ -65,6 +64,7 @@ def get_candles(symbol, start_date, end_date, interval=10, engine="stock", marke
         cols = candles.get("columns", [])
 
         all_dfs.append(pd.DataFrame(rows, columns=cols))
+        print(all_dfs[-1]['begin'].iloc[-1])
 
         if len(rows) < 500:
             break

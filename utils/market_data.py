@@ -14,6 +14,8 @@ def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval, tolerance
         board=inst1['board'],
         interval=interval)
 
+    start_date = df1.index.min()
+
     df2 = get_candles(
         inst2['ticker'],
         start_date,

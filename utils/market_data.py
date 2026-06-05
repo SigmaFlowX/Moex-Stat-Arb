@@ -4,7 +4,7 @@ from datetime import date
 
 
 #get candles for two tickers and merge them in preparation for the backtest
-def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval, tolerance: str = "5m"):
+def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval, tolerance: str = "5m", show=False):
     df1 = get_candles(
         inst1['ticker'],
         start_date,
@@ -12,7 +12,8 @@ def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval, tolerance
         engine=inst1['engine'],
         market=inst1['market'],
         board=inst1['board'],
-        interval=interval)
+        interval=interval,
+        show=show)
 
     start_date = df1.index.min()
 
@@ -23,7 +24,8 @@ def prepare_df(inst1:dict, inst2:dict, start_date, end_date, interval, tolerance
         engine=inst2['engine'],
         market=inst2['market'],
         board=inst2['board'],
-        interval=interval)
+        interval=interval,
+        show=show)
 
     df1.sort_values(by="timestamp", inplace=True)
     df2.sort_values(by="timestamp", inplace=True)
